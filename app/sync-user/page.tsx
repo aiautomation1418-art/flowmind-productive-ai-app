@@ -1,13 +1,34 @@
-import { redirect } from "next/navigation";
+import { db } from "@/db";
+import { users } from "@/db/schema";
 
-import { syncCurrentUserToDatabase } from "@/lib/sync-user";
+export default async function Page() {
+  try {
+    const [syncedUser] = await db
+      .insert(users)
+      .values({
+        clerkUserId: "test123",
+        name: "Ali",
+        email: "ali@test.com",
+      })
+      .returning();
 
-export default async function SyncUserPage() {
-  const syncedUser = await syncCurrentUserToDatabase();
+    console.log(syncedUser);
 
-  if (!syncedUser) {
-    redirect("/sign-in");
+    return (
+      <div>
+        User Synced
+      </div>
+    );
+
+  } catch (error) {
+
+    console.log("DATABASE ERROR:");
+    console.error(error);
+
+    return (
+      <div>
+        Error
+      </div>
+    );
   }
-
-  redirect("/");
 }
